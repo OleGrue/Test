@@ -59,7 +59,7 @@ class Template(object):
     # --> Register callback function and start MQTT
     def start_blocking(self):
         with Hermes(MQTT_ADDR) as h:
-            h.subscribe_intent('testIntent', self.intent_1_callback) \
+            h.subscribe_intent('OleGrue:testIntent', self.intent_1_callback) \
             .loop_forever()
 
 
