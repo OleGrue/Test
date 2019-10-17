@@ -59,6 +59,7 @@ class testIntend(object):
     # --> Register callback function and start MQTT
     def start_blocking(self):
         with Hermes(MQTT_ADDR) as h:
+            print('online')
             h.subscribe_intent('OleGrue:testIntent', self.intent_1_callback) \
             .loop_forever()
 
