@@ -61,7 +61,7 @@ class testIntend(object):
         with Hermes(MQTT_ADDR) as h:
             print('online')
             h.subscribe_intent('OleGrue:testIntent', self.intent_1_callback) \
-            .loop_forever()
+            .start()
 
 
 if __name__ == "__main__":
