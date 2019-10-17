@@ -25,8 +25,9 @@ def read_configuration_file(configuration_file):
         return dict()
 
 def subscribe_intent_callback(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    action_wrapper(hermes, intentMessage, conf)
+    hermes.publish_end_session(intentMessage.session_id, str(intentMessage))
+    # conf = read_configuration_file(CONFIG_INI)
+    # action_wrapper(hermes, intentMessage, conf)
 
 
 def action_wrapper(hermes, intentMessage, conf):
@@ -37,5 +38,28 @@ def action_wrapper(hermes, intentMessage, conf):
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-        h.subscribe_intent("{{intent_id}}", subscribe_intent_callback) \
+        h.subscribe_intent("testIntend", subscribe_intent_callback) \
          .start()
+
+# {
+#   "input": "test this",
+#   "intent": {
+#     "intentName": "OleGrue:testIntend",
+#     "confidenceScore": 1
+#   },
+#   "slots": [
+#     {
+#       "rawValue": "test this",
+#       "value": {
+#         "kind": "Custom",
+#         "value": "test this"
+#       },
+#       "range": {
+#         "start": 0,
+#         "end": 9
+#       },
+#       "entity": "snips/default--test_slot",
+#       "slotName": "test_slot"
+#     }
+#   ]
+# }
