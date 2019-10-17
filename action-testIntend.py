@@ -13,7 +13,7 @@ MQTT_PORT = 1883
 MQTT_ADDR = "{}:{}".format(MQTT_IP_ADDR, str(MQTT_PORT))
 
 
-class Template(object):
+class testIntend(object):
     """Class used to wrap action code with mqtt connection
        Please change the name referring to your application
     """
@@ -64,7 +64,7 @@ class Template(object):
 
 
 if __name__ == "__main__":
-    Template()
+    testIntend()
 
 # {
 #   "input": "test this",
