@@ -1,71 +1,47 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-from snipsTools import SnipsConfigParser
+import configparser
 from hermes_python.hermes import Hermes
+from hermes_python.ffi.utils import MqttOptions
+from hermes_python.ontology import *
+import io
 
+CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
 
-# If this skill is supposed to run on the satellite,
-# please get this mqtt connection info from <config.ini>
-# Hint: MQTT server is always running on the master device
-MQTT_IP_ADDR = "localhost"
-MQTT_PORT = 1883
-MQTT_ADDR = "{}:{}".format(MQTT_IP_ADDR, str(MQTT_PORT))
+class SnipsConfigParser(configparser.SafeConfigParser):
+    def to_dict(self):
+        return {section : {option_name : option for option_name, option in self.items(section)} for section in self.sections()}
 
 
-class testIntend(object):
-    """Class used to wrap action code with mqtt connection
-       Please change the name referring to your application
-    """
+def read_configuration_file(configuration_file):
+    try:
+        with io.open(configuration_file, encoding=CONFIGURATION_ENCODING_FORMAT) as f:
+            conf_parser = SnipsConfigParser()
+            conf_parser.readfp(f)
+            return conf_parser.to_dict()
+    except (IOError, configparser.Error) as e:
+        return dict()
 
-    def __init__(self):
-        # get the configuration if needed
-        try:
-            self.config = SnipsConfigParser.read_configuration_file(CONFIG_INI)
-        except Exception:
-            self.config = None
+def subscribe_intent_callback(hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
+    # action_wrapper(hermes, intentMessage, conf)
+    print("Parsed intent : {}".format(intent_message.intent.intent_name))
+    hermes.publish_end_session(intent_message.session_id, "test")
+    
 
-        # start listening to MQTT
-        self.start_blocking()
 
-    @staticmethod
-    def intent_1_callback(hermes, intent_message):
-        # terminate the session first if not continue
-        hermes.publish_end_session(intent_message.session_id, "")
-
-        # action code goes here...
-        print('[Received] intent: {}'.format(
-            intent_message.intent.intent_name))
-
-        # if need to speak the execution result by tts
-        hermes.publish_start_session_notification(
-            intent_message.site_id,
-            "Action 1", "Test")
-
-    @staticmethod
-    def intent_2_callback(hermes, intent_message):
-        # terminate the session first if not continue
-        hermes.publish_end_session(intent_message.session_id, "")
-
-        # action code goes here...
-        print('[Received] intent: {}'.format(
-            intent_message.intent.intent_name))
-
-        # if need to speak the execution result by tts
-        hermes.publish_start_session_notification(
-            intent_message.site_id,
-            "Action 2", "")
-
-    # --> Register callback function and start MQTT
-    def start_blocking(self):
-        print('online')
-        with Hermes(MQTT_ADDR) as h:
-            h.subscribe_intent('OleGrue:testIntent', self.intent_1_callback) \
-            .start()
+def action_wrapper(hermes, intentMessage, conf):
+    {{#each action_code as |a|}}{{a}}
+    {{/each}}
 
 
 if __name__ == "__main__":
-    testIntend()
+    mqtt_opts = MqttOptions()
+    with Hermes(mqtt_options=mqtt_opts) as h:
+        h.subscribe_intent("OleGrue:testIntend", subscribe_intent_callback) \
+         .start()
 
 # {
 #   "input": "test this",
